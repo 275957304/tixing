@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="author" content="yunlong">
+<meta name="format-detection" content="telephone=no" />
+<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>魔力时代闹钟提醒</title>
+<style type="text/css">
+body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,a,code,em,img,q,small,strong,dd,dl,dt,li,ol,ul,fieldset,form,label,table,tbody,tr,th,td,input{margin:0;padding:0;border:0}
+html{font-size:50px; background-color: #081020; -webkit-text-size-adjust:none;-ms-touch-action:none;}
+body{margin:0 auto; font-family:'STHeiti','Microsoft YaHei',Helvetica,Arial,sans-serif;-webkit-text-size-adjust:none;}
+a,a:active,a:hover,a:focus,a:visited{text-decoration:none}
+a,img{-webkit-touch-callout:none}
+ol,ul,li{list-style:none}
+.clear:after{content:"\0020";display:block;height:0;visibility:hidden;clear:both}
+.clear{zoom:1}
+@-webkit-keyframes load{0%{-webkit-transform:rotate(360deg)}100%{-webkit-transform:rotate(0)}}
+@-moz-keyframes load{0%{-moz-transform:rotate(360deg)}100%{-moz-transform:rotate(0)}}
+.loading{background:#fff;width:100%;height:100%;position:absolute;z-index:999; text-align: center; color: #999; z-index: 99;}
+.loadbox{display:block;position:relative;width:70px;height:70px;margin:0 auto;margin-top:50%; margin-bottom:0.5rem}
+.loadlogo{display:block;position:absolute;z-index:1001;width:60px;height:60px;top:0;left:4px;background:url(http://images.vxinyou.com/gdjh/zt/shuangshiyi/load.png) no-repeat;background-size:100%}
+.loadbg{display:block;position:absolute;z-index:1000;width:70px;height:70px;background:url(http://images.vxinyou.com/gdjh/zt/shuangshiyi/loadbg.png) no-repeat;background-size:100%;-webkit-animation:load 1s ease-in-out infinite both;-moz-animation:load 1s ease-in-out infinite both}
+img{display: block; max-width: 100%;}
+.warp{width: 100%; height: 100%; background-image: url(img/b.jpg); background-size: 100% auto; background-repeat: no-repeat; position: absolute;}
+.logo{display: block; width: 6.0rem; height: 2.48rem; position: absolute; top: 1.6rem; left: 50%; margin-left: -3.0rem; background: url(img/logo.png) no-repeat; background-size: 100% auto; overflow: hidden; text-indent: -999px;}
+.mian{width: 11rem; margin: 7.0rem auto 0;}
+.tit{width: 100%; height: 1.6rem; background: url(img/tit.jpg) no-repeat; background-size: 100% auto;}
+.tit a{display: block; width: 1.6rem; height: 1.4rem; float: right; margin: 0.4rem 0.3rem 0 0; background: url(img/switch.png) no-repeat; background-size: 100% auto;}
+.tit a.active{background: url(img/switch2.png) no-repeat; background-size: 100% auto;}
+.list{background: #2e4a9e;}
+.list li{min-height: 1.4rem; padding: 0.5rem 0.8rem 0.5rem 1.7rem; border-top: 2px solid #273f8d; border-bottom: 2px solid #3f66c0; position: relative;
+background: -webkit-gradient(linear, 0 0, 0 100%, from(#2b4698), to(#385cb8));
+background: -webkit-linear-gradient(#2b4698 0%, #385cb8 100%);
+background: -moz-linear-gradient(#2b4698 0%, #385cb8 100%);
+background: -o-linear-gradient(#2b4698 0%, #385cb8 100%);
+background: linear-gradient(#2b4698 0%, #385cb8 100%);
+}
+.list li i{display: block; width: 0.56rem; height: 0.56rem; background: url(img/a.png) no-repeat; background-size: 100%; position: absolute; left: 0.8rem; top: 0.65rem;}
+.list li.active i{background: url(img/b.png) no-repeat; background-size: 100%;}
+.list li h4{font-size: 0.6rem; color: #fff;}
+.list li p{font-size: 0.5rem; color: #a4bbeb; line-height:1.4;}
+.list li:last-child{border-bottom: none;}
+</style>
+<script type="text/javascript" src="http://images.vxinyou.com/jsCommon/jquery-1.7.2.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+$(function(){
+	var old = parseInt($('html').css('fontSize'));
+	var sizeFn = function(){ 
+		var w = $(window).width(),
+			newSize = old * w / 750;
+		$('html').css('fontSize', newSize + 'px');
+	};
+	sizeFn();
+	$(window).on('resize', function(){sizeFn();});
+})
+</script>
+<div id="loading" class="loading"><div class="loadbox"><div class="loadlogo"></div><div class="loadbg"></div></div><div id="loadingNUM">加载中...</div></div>
+<div class="warp">
+    <a href="http://ml.vxinyou.com/index/" class="logo">魔力时代</a>
+    <div class="mian">
+        <div class="tit"><a id="switch"  href="javascript:;"></a></div>
+        <ul id="list" class="list"></ul>
+    </div>
+</div>
+
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+    $(function(){
+        var e_key     = "noi0nir4"
+            idArra    = [],
+			isSwitch  = 0,
+            openid    = "",
+			share_hero = '魔力时代闹钟提醒',  //分享标题
+			share_img  = 'http://images.vxinyou.com/mlsd/20160119pc/images/icon.png',    //分享图标
+			share_url  = 'http://ml.vxinyou.com/zt/tixing/index.html';     //分享网址 
+			
+		$.getScript('http://event.vxinyou.net/wechat/JsApi/share?mp_name=molishd&random=' + Math.random(), function(script, textStatus) {
+			wxshare();
+		}); 
+       
+        $.getScript('http://event.vxinyou.net/wechat/JsApi/openid?mp_name=molishd&random=' + Math.random(), function(script, textStatus) {
+            if (textStatus == 'success') {
+                if (wechat_open_id == '') {
+                    location.href = wechat_login_url;
+                } else {
+                    openid = wechat_open_id;
+                    $("#loading").fadeOut();                 
+                    //获取消息列表
+                    $.get('http://event.vxinyou.net/activity/Subscription/get_message_list',{"e_key":e_key, "openid":openid},function(response){
+                        if(response.success){
+                            //console.log(response.data);
+                            $.each(response.data, function(index,value){ 
+                                idArra.push(value.id);
+                                $('#list').append('<li data-id='+ value.id +'><i></i><h4>' + value.title +'</h4><p>' + value.content +'</p></li>');  
+                            });
+
+                            //获取玩家订阅消息列表
+                            $.get('http://event.vxinyou.net/activity/Subscription/get_user_list',{"e_key":e_key, "openid":openid},function(response){
+                                if(response.success){                            
+                                    $.each(response.data, function(index,value){                                                            
+                                       for (var i = 0; i < $('#list li').length; i++) {
+                                            console.log($('#list li').eq(i).data('id'));
+                                            if($('#list li').eq(i).data('id') == value.msg_id){
+                                               $('#list li').eq(i).addClass('active'); 
+                                            };
+                                        };
+										if(index == 2){
+											$("#switch").addClass('active');
+											isSwitch  = 1;
+										}
+                                    });
+                                }
+                            },'jsonp')
+
+                            $("#list li").bind("touchstart",function(){                                
+                                var id = $(this).data("id");
+                                if($(this).hasClass('active')){
+                                    idArra.push(id);
+                                    $(this).removeClass('active');
+                                    cancelOrder(id);                                     
+                                }else{
+                                    idArra.splice($.inArray(id,idArra),1);
+                                   $(this).addClass('active');
+                                    submitOrder(id); 
+									if(idArra.length ==3){
+										$("#switch").addClass('active');
+										isSwitch  = 1;
+								   }
+                                };
+                            });
+                        }else{
+                            alert(response.message);
+                        }
+                    },"jsonp");
+
+					
+					$("#switch").on('touchstart',function(){
+						if(isSwitch == 0){
+							submitOrder(idArra.toString())
+							$(this).addClass('active');
+							$('#list li').addClass('active');
+							isSwitch = 1;
+						}else{
+							cancelOrder(idArra.toString())
+							console.log('一键取消' + idArra.toString());
+							$(this).removeClass('active');
+							$('#list li').removeClass('active');
+							isSwitch = 0;
+						}
+					});					
+
+                    function submitOrder(msg_id){
+                       $.get('http://event.vxinyou.net/activity/Subscription/submit_user',{"e_key":e_key, "openid":openid, 'msg_id':msg_id},function(response){
+                            console.log('提交订阅'+msg_id)
+                       },'jsonp') 
+                    };
+
+                    function cancelOrder(msg_id){
+                       $.get('http://event.vxinyou.net/activity/Subscription/cancel_user',{"e_key":e_key, "openid":openid, 'msg_id':msg_id},function(response){
+                            console.log('取消订阅'+msg_id);
+							$("#switch").removeClass('active');
+							isSwitch  = 0;
+                       },'jsonp') 
+                    };       
+                
+                };
+            }
+            else
+            {
+                alert('加载微信用户open_id接口失败');
+            }
+        });
+    });
+	
+	function wxshare(){
+	    wx.ready(function () {
+	    // 分享到朋友圈
+	        wx.onMenuShareTimeline({
+	            title: share_hero, // 分享标题
+	            link: share_url, // 分享链接
+	            imgUrl: share_img, // 分享图标
+	            success: function () { 
+	                // 用户确认分享后执行的回调函数
+	                share();
+	            },
+	            cancel: function () { 
+	                // 用户取消分享后执行的回调函数
+	            }
+	        });
+
+	        // 分享给朋友
+	        wx.onMenuShareAppMessage({
+	            title: share_hero, // 分享标题
+	            desc: '魔力时代闹钟提醒', // 分享描述
+	            link: share_url, // 分享链接
+	            imgUrl: share_img, // 分享图标
+	            type: '', // 分享类型,music、video或link，不填默认为link
+	            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+	            success: function () { 
+	                // 用户确认分享后执行的回调函数
+	                share();
+	            },
+	            cancel: function () { 
+	                // 用户取消分享后执行的回调函数
+	            }
+	        });
+	    });
+	};
+</script>
+</body>
+</html>
